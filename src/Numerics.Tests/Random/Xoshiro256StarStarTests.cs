@@ -1,9 +1,9 @@
-﻿// <copyright file="AssemblyInfo.fs" company="Math.NET">
+// <copyright file="Xoshiro256StarStarTests.cs" company="Math.NET">
 // Math.NET Numerics, part of the Math.NET Project
 // http://numerics.mathdotnet.com
 // http://github.com/mathnet/mathnet-numerics
 //
-// Copyright (c) 2009 Math.NET
+// Copyright (c) 2009-2016 Math.NET
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -27,28 +27,28 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 // </copyright>
 
-namespace MathNet.Numerics
+using MathNet.Numerics.Random;
+using NUnit.Framework;
 
-open System.Reflection
-open System.Resources;
-open System.Runtime.CompilerServices
-open System.Runtime.InteropServices
+namespace MathNet.Numerics.UnitTests.Random
+{
+    /// <summary>
+    /// Test for xoshiro256** pseudo random number generator.
+    /// </summary>
+    [TestFixture, Category("Random")]
+    public class Xoshiro256StarStarTests : RandomTests
+    {
+        /// <summary>
+        /// Initializes a new instance of the Wh2006Tests class.
+        /// </summary>
+        public Xoshiro256StarStarTests() : base(typeof (Xoshiro256StarStar))
+        {
+        }
 
-[<assembly: AssemblyTitle("Math.NET Numerics for F#")>]
-[<assembly: AssemblyDescription("F# Modules for Math.NET Numerics, providing methods and algorithms for numerical computations in science, engineering and every day use.")>]
-[<assembly: AssemblyConfiguration("")>]
-[<assembly: AssemblyCompany("Math.NET Project")>]
-[<assembly: AssemblyProduct("Math.NET Numerics")>]
-[<assembly: AssemblyCopyright("Copyright (c) Math.NET Project")>]
-[<assembly: AssemblyTrademark("")>]
-[<assembly: AssemblyCulture("")>]
-[<assembly: NeutralResourcesLanguage("en")>]
-
-[<assembly: AssemblyVersion("4.5.1.0")>]
-[<assembly: AssemblyFileVersion("4.5.1.0")>]
-[<assembly: AssemblyInformationalVersion("4.5.1")>]
-
-[<assembly: ComVisible(false)>]
-[<assembly: Guid("048BC4EB-CE2B-4040-9967-4784F5405B0F")>]
-
-()
+        [Test]
+        public void StaticSamplesConsistent()
+        {
+            Assert.That(Xoshiro256StarStar.Doubles(1000, 1), Is.EqualTo(new Xoshiro256StarStar(1).NextDoubles(1000)).Within(1e-12).AsCollection);
+        }
+    }
+}

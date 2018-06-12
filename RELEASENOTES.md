@@ -1,3 +1,12 @@
+### 4.5.1 - 2018-05-22
+* Signed NuGet packages
+
+### 4.5.0 - 2018-05-22
+* Random: New Xoshiro256StarStar random source *~Colin Green*
+
+### 4.4.1 - 2018-05-06
+* Build: strong-name edition .Signed NuGet packages are available again
+
 ### 4.4.0 - 2018-02-25
 * Linear Algebra: managed provider performance improvements on basic vector arithmetics
 
