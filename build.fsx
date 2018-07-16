@@ -44,223 +44,113 @@ traceHeader releases
 
 // NUMERICS PACKAGES
 
-let numericsZipPackage =
-    { Id = "MathNet.Numerics"
-      Release = numericsRelease
-      Title = "Math.NET Numerics"
-      FsLoader = true }
+let numericsZipPackage = zipPackage "MathNet.Numerics" "Math.NET Numerics" numericsRelease true
+let numericsStrongNameZipPackage = zipPackage "MathNet.Numerics.Signed" "Math.NET Numerics" numericsRelease true
 
-let numericsStrongNameZipPackage =
-    { numericsZipPackage with
-        Id = "MathNet.Numerics.Signed" }
+let numericsNuGetPackage = nugetPackage "MathNet.Numerics" numericsRelease
+let numericsFSharpNuGetPackage = nugetPackage "MathNet.Numerics.FSharp" numericsRelease
+let numericsStrongNameNuGetPackage = nugetPackage "MathNet.Numerics.Signed" numericsRelease
+let numericsFSharpStrongNameNuGetPackage = nugetPackage "MathNet.Numerics.FSharp.Signed" numericsRelease
 
-let numericsNuGetPackage = { Id = "MathNet.Numerics"; Release = numericsRelease }
-let numericsFSharpNuGetPackage = { Id = "MathNet.Numerics.FSharp"; Release = numericsRelease }
-let numericsStrongNameNuGetPackage = { Id = "MathNet.Numerics.Signed"; Release = numericsRelease }
-let numericsFSharpStrongNameNuGetPackage = { Id = "MathNet.Numerics.FSharp.Signed"; Release = numericsRelease }
-
-let numericsProject = { AssemblyName = "MathNet.Numerics"; ProjectFile = "src/Numerics/Numerics.csproj"; OutputDir = "src/Numerics/bin/Release" }
-let fsharpProject = { AssemblyName = "MathNet.Numerics.FSharp"; ProjectFile = "src/FSharp/FSharp.fsproj"; OutputDir = "src/FSharp/bin/Release" }
+let numericsProject = project "MathNet.Numerics" "src/Numerics/Numerics.csproj" [numericsNuGetPackage; numericsStrongNameNuGetPackage]
+let numericsFsharpProject = project "MathNet.Numerics.FSharp" "src/FSharp/FSharp.fsproj" [numericsFSharpNuGetPackage; numericsFSharpStrongNameNuGetPackage]
+let numericsSolution = solution "Numerics" "MathNet.Numerics.sln" [numericsProject; numericsFsharpProject] [numericsZipPackage; numericsStrongNameZipPackage]
 
 
 // DATA EXTENSION PACKAGES
 
-let dataZipPackage =
-    { Id = "MathNet.Numerics.Data"
-      Release = dataRelease
-      Title = "Math.NET Numerics Data Extensions"
-      FsLoader = false }
+let dataZipPackage = zipPackage "MathNet.Numerics.Data" "Math.NET Numerics Data Extensions" dataRelease false
+let dataStrongNameZipPackage = zipPackage "MathNet.Numerics.Data.Signed" "Math.NET Numerics Data Extensions" dataRelease false
 
-let dataStrongNameZipPackage =
-    { dataZipPackage with
-        Id = "MathNet.Numerics.Data.Signed" }
+let dataTextNuGetPackage = nugetPackage "MathNet.Numerics.Data.Text" dataRelease
+let dataMatlabNuGetPackage = nugetPackage "MathNet.Numerics.Data.Matlab" dataRelease
+let dataTextStrongNameNuGetPackage = nugetPackage "MathNet.Numerics.Data.Text.Signed" dataRelease
+let dataMatlabStrongNameNuGetPackage = nugetPackage "MathNet.Numerics.Data.Matlab.Signed" dataRelease
 
-let dataTextNuGetPackage = { Id = "MathNet.Numerics.Data.Text"; Release = dataRelease }
-let dataMatlabNuGetPackage = { Id = "MathNet.Numerics.Data.Matlab"; Release = dataRelease }
-let dataTextStrongNameNuGetPackage = { Id = "MathNet.Numerics.Data.Text.Signed"; Release = dataRelease }
-let dataMatlabStrongNameNuGetPackage = { Id = "MathNet.Numerics.Data.Matlab.Signed"; Release = dataRelease }
-
-let dataTextProject = { AssemblyName = "MathNet.Numerics.Data.Text"; ProjectFile = "src/Data/Text/Text.csproj"; OutputDir = "src/Data/Text/bin/Release" }
-let dataMatlabProject = { AssemblyName = "MathNet.Numerics.Data.Matlab"; ProjectFile = "src/Data/Matlab/Matlab.csproj"; OutputDir = "src/Data/Matlab/bin/Release" }
+let dataTextProject = project "MathNet.Numerics.Data.Text" "src/Data/Text/Text.csproj" [dataTextNuGetPackage; dataTextStrongNameNuGetPackage]
+let dataMatlabProject = project "MathNet.Numerics.Data.Matlab" "src/Data/Matlab/Matlab.csproj" [dataMatlabNuGetPackage; dataMatlabStrongNameNuGetPackage]
+let dataSolution = solution "Data" "MathNet.Numerics.Data.sln" [dataTextProject; dataMatlabProject] [dataZipPackage; dataStrongNameZipPackage]
 
 
 // MKL NATIVE PROVIDER PACKAGES
 
+let mklWinZipPackage = zipPackage "MathNet.Numerics.MKL.Win" "Math.NET Numerics MKL Native Provider for Windows" mklRelease false
+let mklLinuxZipPackage = zipPackage "MathNet.Numerics.MKL.Linux" "Math.NET Numerics MKL Native Provider for Linux" mklRelease false
+
+let mklWinNuGetPackage = nugetPackage "MathNet.Numerics.MKL.Win" mklRelease
+let mklWin32NuGetPackage = nugetPackage "MathNet.Numerics.MKL.Win-x86" mklRelease
+let mklWin64NuGetPackage = nugetPackage "MathNet.Numerics.MKL.Win-x64" mklRelease
+let mklLinuxNuGetPackage = nugetPackage "MathNet.Numerics.MKL.Linux" mklRelease
+let mklLinux32NuGetPackage = nugetPackage "MathNet.Numerics.MKL.Linux-x86" mklRelease
+let mklLinux64NuGetPackage = nugetPackage "MathNet.Numerics.MKL.Linux-x64" mklRelease
+
+let mklWinProject = nativeProject "MathNet.Numerics.MKL" "src/NativeProviders/Windows/MKL/MKLWrapper.vcxproj" [mklWinNuGetPackage; mklWin32NuGetPackage; mklWin64NuGetPackage]
+let mklLinuxProject = nativeBashScriptProject "MathNet.Numerics.MKL" "src/NativeProviders/Linux/mkl_build.sh" [mklLinuxNuGetPackage; mklLinux32NuGetPackage; mklLinux64NuGetPackage]
+let mklSolution = solution "MKL" "MathNet.Numerics.MKL.sln" [mklWinProject; mklLinuxProject] [mklWinZipPackage; mklLinuxZipPackage]
+
 let mklWinPack =
-    { Id = "MathNet.Numerics.MKL.Win"
-      Release = mklRelease
-      Title = "Math.NET Numerics - MKL Native Provider for Windows (x64 and x86)"
-      Summary = ""
-      Description = "Intel MKL native libraries for Math.NET Numerics on Windows."
-      Tags = "math numeric statistics probability integration interpolation linear algebra matrix fft native mkl"
-      Authors = [ "Christoph Ruegg"; "Marcus Cuda"; "Jurgen Van Gael" ]
-      FsLoader = false
-      Dependencies = []
-      Files =
-        [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.MKL.Win.targets", None;
-          @"..\..\out\MKL\Windows\x64\libiomp5md.dll", Some @"build\x64", None;
-          @"..\..\out\MKL\Windows\x64\MathNet.Numerics.MKL.dll", Some @"build\x64", None;
-          @"..\..\out\MKL\Windows\x86\libiomp5md.dll", Some @"build\x86", None;
-          @"..\..\out\MKL\Windows\x86\MathNet.Numerics.MKL.dll", Some @"build\x86", None ] }
+    { NuGet = mklWinNuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.MKL.Win.nuspec"
+      Title = "Math.NET Numerics - MKL Native Provider for Windows (x64 and x86)" }
 
 let mklWin32Pack =
-    { mklWinPack with
-        Id = "MathNet.Numerics.MKL.Win-x86"
-        Title = "Math.NET Numerics - MKL Native Provider for Windows (x86)"
-        Files =
-          [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.MKL.Win-x86.targets", None;
-            @"..\..\out\MKL\Windows\x86\libiomp5md.dll", Some @"build\x86", None;
-            @"..\..\out\MKL\Windows\x86\MathNet.Numerics.MKL.dll", Some @"build\x86", None ] }
+    { NuGet = mklWin32NuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.MKL.Win-x86.nuspec"
+      Title = "Math.NET Numerics - MKL Native Provider for Windows (x86)" }
 
 let mklWin64Pack =
-    { mklWinPack with
-        Id = "MathNet.Numerics.MKL.Win-x64"
-        Title = "Math.NET Numerics - MKL Native Provider for Windows (x64)"
-        Files =
-          [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.MKL.Win-x64.targets", None;
-            @"..\..\out\MKL\Windows\x64\libiomp5md.dll", Some @"build\x64", None;
-            @"..\..\out\MKL\Windows\x64\MathNet.Numerics.MKL.dll", Some @"build\x64", None ] }
+    { NuGet = mklWin64NuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.MKL.Win-x64.nuspec"
+      Title = "Math.NET Numerics - MKL Native Provider for Windows (x64)" }
 
 let mklLinuxPack =
-    { Id = "MathNet.Numerics.MKL.Linux"
-      Release = mklRelease
-      Title = "Math.NET Numerics - MKL Native Provider for Linux (x64 and x86)"
-      Summary = ""
-      Description = "Intel MKL native libraries for Math.NET Numerics on Linux."
-      Tags = "math numeric statistics probability integration interpolation linear algebra matrix fft native mkl"
-      Authors = [ "Christoph Ruegg"; "Marcus Cuda"; "Jurgen Van Gael" ]
-      FsLoader = false
-      Dependencies = []
-      Files =
-        [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.MKL.Linux.targets", None;
-          @"..\..\out\MKL\Linux\x64\libiomp5.so", Some @"build\x64", None;
-          @"..\..\out\MKL\Linux\x64\MathNet.Numerics.MKL.dll", Some @"build\x64", None;
-          @"..\..\out\MKL\Linux\x86\libiomp5.so", Some @"build\x86", None;
-          @"..\..\out\MKL\Linux\x86\MathNet.Numerics.MKL.dll", Some @"build\x86", None ] }
+    { NuGet = mklLinuxNuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.MKL.Linux.nuspec"
+      Title = "Math.NET Numerics - MKL Native Provider for Linux (x64 and x86)" }
 
 let mklLinux32Pack =
-    { mklLinuxPack with
-        Id = "MathNet.Numerics.MKL.Linux-x86"
-        Title = "Math.NET Numerics - MKL Native Provider for Linux (x86)"
-        Files =
-          [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.MKL.Linux-x86.targets", None;
-            @"..\..\out\MKL\Linux\x86\libiomp5.so", Some @"build\x86", None;
-            @"..\..\out\MKL\Linux\x86\MathNet.Numerics.MKL.dll", Some @"build\x86", None ] }
+    { NuGet = mklLinux32NuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.MKL.Linux-x86.nuspec"
+      Title = "Math.NET Numerics - MKL Native Provider for Linux (x86)" }
 
 let mklLinux64Pack =
-    { mklLinuxPack with
-        Id = "MathNet.Numerics.MKL.Linux-x64"
-        Title = "Math.NET Numerics - MKL Native Provider for Linux (x64)"
-        Files =
-          [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.MKL.Linux-x64.targets", None;
-            @"..\..\out\MKL\Linux\x64\libiomp5.so", Some @"build\x64", None;
-            @"..\..\out\MKL\Linux\x64\MathNet.Numerics.MKL.dll", Some @"build\x64", None ] }
-
-let mklWinBundle =
-    { Id = "MathNet.Numerics.MKL.Win"
-      Release = mklRelease
-      Title = "Math.NET Numerics MKL Native Provider for Windows"
-      Packages = [ mklWinPack; mklWin32Pack; mklWin64Pack ] }
-
-let mklLinuxBundle =
-    { Id = "MathNet.Numerics.MKL.Linux"
-      Release = mklRelease
-      Title = "Math.NET Numerics MKL Native Provider for Linux"
-      Packages = [ mklLinuxPack; mklLinux32Pack; mklLinux64Pack ] }
-
-let mklWinZipPackage =
-    { Id = "MathNet.Numerics.MKL.Win"
-      Release = mklRelease
-      Title = "Math.NET Numerics MKL Native Provider for Windows"
-      FsLoader = false }
-
-let mklLinuxZipPackage =
-    { Id = "MathNet.Numerics.MKL.Linux"
-      Release = mklRelease
-      Title = "Math.NET Numerics MKL Native Provider for Linux"
-      FsLoader = false }
-
-
-let mklWinNuGetPackage = { Id = "MathNet.Numerics.MKL.Win"; Release = mklRelease }
-let mklWin32NuGetPackage = { Id = "MathNet.Numerics.MKL.Win-x86"; Release = mklRelease }
-let mklWin64NuGetPackage = { Id = "MathNet.Numerics.MKL.Win-x64"; Release = mklRelease }
-let mklLinuxNuGetPackage = { Id = "MathNet.Numerics.MKL.Linux"; Release = mklRelease }
-let mklLinux32NuGetPackage = { Id = "MathNet.Numerics.MKL.Linux-x86"; Release = mklRelease }
-let mklLinux64NuGetPackage = { Id = "MathNet.Numerics.MKL.Linux-x64"; Release = mklRelease }
+    { NuGet = mklLinux64NuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.MKL.Linux-x64.nuspec"
+      Title = "Math.NET Numerics - MKL Native Provider for Linux (x64)" }
 
 
 // CUDA NATIVE PROVIDER PACKAGES
 
+let cudaWinZipPackage = zipPackage "MathNet.Numerics.CUDA.Win" "Math.NET Numerics CUDA Native Provider for Windows" cudaRelease false
+let cudaWinNuGetPackage = nugetPackage "MathNet.Numerics.CUDA.Win" cudaRelease
+
+let cudaWinProject = nativeProject "MathNet.Numerics.CUDA" "src/NativeProviders/Windows/CUDA/CUDAWrapper.vcxproj" [cudaWinNuGetPackage]
+let cudaSolution = solution "CUDA" "MathNet.Numerics.CUDA.sln" [cudaWinProject] [cudaWinZipPackage]
+
 let cudaWinPack =
-    { Id = "MathNet.Numerics.CUDA.Win"
-      Release = cudaRelease
-      Title = "Math.NET Numerics - CUDA Native Provider for Windows (x64)"
-      Summary = ""
-      Description = "Nvidia CUDA native libraries for Math.NET Numerics."
-      Tags = "math numeric statistics probability integration interpolation linear algebra matrix fft native cuda gpu"
-      Authors = [ "Matthew A Johnson"; "Christoph Ruegg" ]
-      FsLoader = false
-      Dependencies = []
-      Files =
-        [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.CUDA.Win.targets", None;
-          @"..\..\out\CUDA\Windows\x64\cublas64_70.dll", Some "content", None;
-          @"..\..\out\CUDA\Windows\x64\cudart64_70.dll", Some "content", None;
-          @"..\..\out\CUDA\Windows\x64\cusolver64_70.dll", Some "content", None;
-          @"..\..\out\CUDA\Windows\x64\MathNet.Numerics.CUDA.dll", Some "content", None ] }
-
-let cudaWinBundle =
-    { Id = "MathNet.Numerics.CUDA.Win"
-      Release = cudaRelease
-      Title = "Math.NET Numerics CUDA Native Provider for Windows"
-      Packages = [ cudaWinPack ] }
-
-let cudaWinZipPackage =
-    { Id = "MathNet.Numerics.CUDA.Win"
-      Release = cudaRelease
-      Title = "Math.NET Numerics CUDA Native Provider for Windows"
-      FsLoader = false }
-
-let cudaWinNuGetPackage = { Id = "MathNet.Numerics.CUDA.Win"; Release = cudaRelease }
+    { NuGet = cudaWinNuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.CUDA.Win.nuspec"
+      Title = "Math.NET Numerics - CUDA Native Provider for Windows (x64)" }
 
 
 // OpenBLAS NATIVE PROVIDER PACKAGES
 
+let openBlasWinZipPackage = zipPackage "MathNet.Numerics.OpenBLAS.Win" "Math.NET Numerics OpenBLAS Native Provider for Windows" openBlasRelease false
+let openBlasWinNuGetPackage = nugetPackage "MathNet.Numerics.OpenBLAS.Win" openBlasRelease
+
+let openBlasWinProject = nativeProject "MathNet.Numerics.OpenBLAS" "src/NativeProviders/Windows/OpenBLAS/OpenBLASWrapper.vcxproj" [openBlasWinNuGetPackage]
+let openBlasSolution = solution "OpenBLAS" "MathNet.Numerics.OpenBLAS.sln" [openBlasWinProject] [openBlasWinZipPackage]
+
 let openBlasWinPack =
-    { Id = "MathNet.Numerics.OpenBLAS.Win"
-      Release = openBlasRelease
-      Title = "Math.NET Numerics - OpenBLAS Native Provider for Windows (x64 and x86)"
-      Summary = ""
-      Description = "OpenBLAS native libraries for Math.NET Numerics."
-      Tags = "math numeric statistics probability integration interpolation linear algebra matrix fft native openblas"
-      Authors = [ "Kuan Bartel"; "Christoph Ruegg"; "Marcus Cuda" ]
-      FsLoader = false
-      Dependencies = []
-      Files =
-        [ @"..\..\build\NativeProvider.targets", Some "build\MathNet.Numerics.OpenBLAS.Win.targets", None;
-          @"..\..\out\OpenBLAS\Windows\x64\libgcc_s_seh-1.dll", Some @"build\x64", None;
-          @"..\..\out\OpenBLAS\Windows\x64\libgfortran-3.dll", Some @"build\x64", None;
-          @"..\..\out\OpenBLAS\Windows\x64\libopenblas.dll", Some @"build\x64", None;
-          @"..\..\out\OpenBLAS\Windows\x64\libquadmath-0.dll", Some @"build\x64", None;
-          @"..\..\out\OpenBLAS\Windows\x64\MathNet.Numerics.OpenBLAS.dll", Some @"build\x64", None;
-          @"..\..\out\OpenBLAS\Windows\x86\libgcc_s_sjlj-1.dll", Some @"build\x86", None;
-          @"..\..\out\OpenBLAS\Windows\x86\libgfortran-3.dll", Some @"build\x86", None;
-          @"..\..\out\OpenBLAS\Windows\x86\libopenblas.dll", Some @"build\x86", None;
-          @"..\..\out\OpenBLAS\Windows\x86\libquadmath-0.dll", Some @"build\x86", None;
-          @"..\..\out\OpenBLAS\Windows\x86\MathNet.Numerics.OpenBLAS.dll", Some @"build\x86", None ] }
+    { NuGet = openBlasWinNuGetPackage
+      NuSpecFile = "build/MathNet.Numerics.OpenBLAS.Win.nuspec"
+      Title = "Math.NET Numerics - OpenBLAS Native Provider for Windows (x64 and x86)" }
 
-let openBlasWinBundle =
-    { Id = "MathNet.Numerics.OpenBLAS.Win"
-      Release = openBlasRelease
-      Title = "Math.NET Numerics OpenBLAS Native Provider for Windows"
-      Packages = [ openBlasWinPack ] }
 
-let openBlasWinZipPackage =
-    { Id = "MathNet.Numerics.OpenBLAS.Win"
-      Release = openBlasRelease
-      Title = "Math.NET Numerics OpenBLAS Native Provider for Windows"
-      FsLoader = false }
+// ALL
 
-let openBlasWinNuGetPackage = { Id = "MathNet.Numerics.OpenBLAS.Win"; Release = openBlasRelease }
+let allSolutions = [numericsSolution; dataSolution]
+let allProjects = allSolutions |> List.collect (fun s -> s.Projects) |> List.distinct
 
 
 // --------------------------------------------------------------------------------------
@@ -271,29 +161,23 @@ Target "Start" DoNothing
 
 Target "Clean" (fun _ ->
     DeleteDirs (!! "src/**/obj/" ++ "src/**/bin/" )
-    CleanDirs [ "out/api"; "out/docs"; "out/Numerics/packages/Zip"; "out/Numerics/packages/NuGet"; "out/Numerics/lib"; "out/Numerics/lib-strongname" ]
-    CleanDirs [ "out/Data"; "out/Data/packages/Zip"; "out/Data/packages/NuGet"; "out/Data/lib"; "out/Data/lib-strongname" ] // Data Extensions
+    CleanDirs [ "out/api"; "out/docs" ]
     CleanDirs [ "out/MKL"; "out/ATLAS"; "out/CUDA"; "out/OpenBLAS" ] // Native Providers
-    clean "MathNet.Numerics.sln"
-    clean "MathNet.Numerics.Data.sln")
+    allSolutions |> List.iter (fun solution -> CleanDirs [ solution.OutputZipDir; solution.OutputNuGetDir; solution.OutputLibDir; solution.OutputLibStrongNameDir ])
+    allSolutions |> List.iter clean)
 
 Target "ApplyVersion" (fun _ ->
+    allProjects |> List.iter patchVersionInProjectFile
     patchVersionInAssemblyInfo "src/FSharp" numericsRelease
     patchVersionInAssemblyInfo "src/TestData" numericsRelease
     patchVersionInAssemblyInfo "src/Numerics.Tests" numericsRelease
     patchVersionInAssemblyInfo "src/FSharp.Tests" numericsRelease
     patchVersionInAssemblyInfo "src/Data.Tests" dataRelease
-    patchVersionInProjectFile "src/Numerics/Numerics.csproj" numericsRelease
-    patchVersionInProjectFile "src/FSharp/FSharp.fsproj" numericsRelease
-    patchVersionInProjectFile "src/Data/Text/Text.csproj" dataRelease
-    patchVersionInProjectFile "src/Data/Matlab/Matlab.csproj" dataRelease
     patchVersionInResource "src/NativeProviders/MKL/resource.rc" mklRelease
     patchVersionInResource "src/NativeProviders/CUDA/resource.rc" cudaRelease
     patchVersionInResource "src/NativeProviders/OpenBLAS/resource.rc" openBlasRelease)
 
-Target "Restore" (fun _ ->
-    restore "MathNet.Numerics.sln"
-    restore "MathNet.Numerics.Data.sln")
+Target "Restore" (fun _ -> allSolutions |> List.iter restore)
 "Start"
   =?> ("Clean", not (hasBuildParam "incremental"))
   ==> "Restore"
@@ -317,33 +201,28 @@ Target "Build" (fun _ ->
     // Strong Name Build (with strong name, without certificate signature)
     if hasBuildParam "strongname" then
         CleanDirs (!! "src/**/obj/" ++ "src/**/bin/" )
-        restoreSN "MathNet.Numerics.sln"
-        buildSN "MathNet.Numerics.sln"
-        collectBinaries numericsProject "out/Numerics/lib-strongname"
-        collectBinaries fsharpProject "out/Numerics/lib-strongname"
-        zip numericsStrongNameZipPackage "out/Numerics/packages/Zip" "out/Numerics/lib-strongname" (fun f -> f.Contains("MathNet.Numerics.") || f.Contains("System.Threading.") || f.Contains("FSharp.Core."))
+        restoreSN numericsSolution
+        buildSN numericsSolution
+        if isWindows && hasBuildParam "sign" then sign fingerprint timeserver numericsSolution
+        collectBinariesSN numericsSolution
+        zip numericsStrongNameZipPackage numericsSolution.OutputZipDir numericsSolution.OutputLibStrongNameDir (fun f -> f.Contains("MathNet.Numerics.") || f.Contains("System.Threading.") || f.Contains("FSharp.Core."))
         if isWindows then
-            packSN "MathNet.Numerics.sln"
-            collectNuGetPackages numericsProject "out/Numerics/packages/NuGet"
-            collectNuGetPackages fsharpProject "out/Numerics/packages/NuGet"
+            packSN numericsSolution
+            collectNuGetPackages numericsSolution
 
     // Normal Build (without strong name, with certificate signature)
     CleanDirs (!! "src/**/obj/" ++ "src/**/bin/" )
-    restore "MathNet.Numerics.sln"
-    build "MathNet.Numerics.sln"
-    if isWindows && hasBuildParam "sign" then
-        sign fingerprint timeserver (!! (numericsProject.OutputDir + "**/MathNet.Numerics.dll") ++ (fsharpProject.OutputDir + "**/MathNet.Numerics.FSharp.dll") )
-    collectBinaries numericsProject "out/Numerics/lib"
-    collectBinaries fsharpProject "out/Numerics/lib"
-    zip numericsZipPackage "out/Numerics/packages/Zip" "out/Numerics/lib" (fun f -> f.Contains("MathNet.Numerics.") || f.Contains("System.Threading.") || f.Contains("FSharp.Core."))
+    restore numericsSolution
+    build numericsSolution
+    if isWindows && hasBuildParam "sign" then sign fingerprint timeserver numericsSolution
+    collectBinaries numericsSolution
+    zip numericsZipPackage numericsSolution.OutputZipDir numericsSolution.OutputLibDir (fun f -> f.Contains("MathNet.Numerics.") || f.Contains("System.Threading.") || f.Contains("FSharp.Core."))
     if isWindows then
-        pack "MathNet.Numerics.sln"
-        collectNuGetPackages numericsProject "out/Numerics/packages/NuGet"
-        collectNuGetPackages fsharpProject "out/Numerics/packages/NuGet"
+        pack numericsSolution
+        collectNuGetPackages numericsSolution
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then
-        Seq.iter (signNuGet fingerprint timeserver) !! "out/Numerics/packages/NuGet/*.nupkg"
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver numericsSolution
 
     )
 "Prepare" ==> "Build"
@@ -353,54 +232,80 @@ Target "DataBuild" (fun _ ->
     // Strong Name Build (with strong name, without certificate signature)
     if hasBuildParam "strongname" then
         CleanDirs (!! "src/**/obj/" ++ "src/**/bin/" )
-        restoreSN "MathNet.Numerics.Data.sln"
-        buildSN "MathNet.Numerics.Data.sln"
-        collectBinaries dataTextProject "out/Data/lib-strongname"
-        collectBinaries dataMatlabProject "out/Data/lib-strongname"
-        zip dataStrongNameZipPackage "out/Data/packages/Zip" "out/Data/lib-strongname" (fun f -> f.Contains("MathNet.Numerics.Data."))
+        restoreSN dataSolution
+        buildSN dataSolution
+        if isWindows && hasBuildParam "sign" then sign fingerprint timeserver dataSolution
+        collectBinariesSN dataSolution
+        zip dataStrongNameZipPackage dataSolution.OutputZipDir dataSolution.OutputLibStrongNameDir (fun f -> f.Contains("MathNet.Numerics.Data."))
         if isWindows then
-            packSN dataTextProject.ProjectFile
-            packSN dataMatlabProject.ProjectFile
-            collectNuGetPackages dataTextProject "out/Data/packages/NuGet"
-            collectNuGetPackages dataMatlabProject "out/Data/packages/NuGet"
+            packProjectSN dataTextProject
+            packProjectSN dataMatlabProject
+            collectNuGetPackages dataSolution
 
     // Normal Build (without strong name, with certificate signature)
     CleanDirs (!! "src/**/obj/" ++ "src/**/bin/" )
-    restore "MathNet.Numerics.Data.sln"
-    build "MathNet.Numerics.Data.sln"
-    if isWindows && hasBuildParam "sign" then
-        sign fingerprint timeserver (!! (dataTextProject.OutputDir + "**/MathNet.Numerics.Data.Text.dll") ++ (dataMatlabProject.OutputDir + "**/MathNet.Numerics.Data.Matlab.dll") )
-    collectBinaries dataTextProject "out/Data/lib"
-    collectBinaries dataMatlabProject "out/Data/lib"
-    zip dataZipPackage "out/Data/packages/Zip" "out/Data/lib" (fun f -> f.Contains("MathNet.Numerics.Data."))
+    restore dataSolution
+    build dataSolution
+    if isWindows && hasBuildParam "sign" then sign fingerprint timeserver dataSolution
+    collectBinaries dataSolution
+    zip dataZipPackage dataSolution.OutputZipDir dataSolution.OutputLibDir (fun f -> f.Contains("MathNet.Numerics.Data."))
     if isWindows then
-        pack dataTextProject.ProjectFile
-        pack dataMatlabProject.ProjectFile
-        collectNuGetPackages dataTextProject "out/Data/packages/NuGet"
-        collectNuGetPackages dataMatlabProject "out/Data/packages/NuGet"
+        packProject dataTextProject
+        packProject dataMatlabProject
+        collectNuGetPackages dataSolution
 
     // NuGet Sign (all or nothing)
-    if isWindows && hasBuildParam "sign" then
-        Seq.iter (signNuGet fingerprint timeserver) !! "out/Data/packages/NuGet/*.nupkg"
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver dataSolution
 
     )
 "Prepare" ==> "DataBuild"
 
-Target "MklWin32Build" (fun _ -> buildConfig32 "Release-MKL" !! "MathNet.Numerics.NativeProviders.sln")
-Target "MklWin64Build" (fun _ -> buildConfig64 "Release-MKL" !! "MathNet.Numerics.NativeProviders.sln")
-Target "MklWinBuild" DoNothing
-"Prepare" ==> "MklWin32Build" ==> "MklWinBuild"
-"Prepare" ==> "MklWin64Build" ==> "MklWinBuild"
+Target "MklWinBuild" (fun _ ->
 
-Target "CudaWin64Build" (fun _ -> buildConfig64 "Release-CUDA" !! "MathNet.Numerics.NativeProviders.sln")
-Target "CudaWinBuild" DoNothing
-"Prepare" ==> "CudaWin64Build" ==> "CudaWinBuild"
+    restore mklSolution
+    buildConfig32 "Release-MKL" !! "MathNet.Numerics.MKL.sln"
+    buildConfig64 "Release-MKL" !! "MathNet.Numerics.MKL.sln"
+    CreateDir mklSolution.OutputZipDir
+    zip mklWinZipPackage mklSolution.OutputZipDir "out/MKL/Windows" (fun f -> f.Contains("MathNet.Numerics.MKL.") || f.Contains("libiomp5md.dll"))
+    CreateDir mklSolution.OutputNuGetDir
+    nugetPackManually mklSolution [ mklWinPack; mklWin32Pack; mklWin64Pack ]
 
-Target "OpenBlasWin32Build" (fun _ -> buildConfig32 "Release-OpenBLAS" !! "MathNet.Numerics.NativeProviders.sln")
-Target "OpenBlasWin64Build" (fun _ -> buildConfig64 "Release-OpenBLAS" !! "MathNet.Numerics.NativeProviders.sln")
-Target "OpenBlasWinBuild" DoNothing
-"Prepare" ==> "OpenBlasWin32Build" ==> "OpenBlasWinBuild"
-"Prepare" ==> "OpenBlasWin64Build" ==> "OpenBlasWinBuild"
+    // NuGet Sign (all or nothing)
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver mklSolution
+
+    )
+"Prepare" ==> "MklWinBuild"
+
+Target "CudaWinBuild" (fun _ ->
+
+    restore cudaSolution
+    buildConfig64 "Release-CUDA" !! "MathNet.Numerics.CUDA.sln"
+    CreateDir cudaSolution.OutputZipDir
+    zip cudaWinZipPackage cudaSolution.OutputZipDir "out/CUDA/Windows" (fun f -> f.Contains("MathNet.Numerics.CUDA.") || f.Contains("cublas") || f.Contains("cudart") || f.Contains("cusolver"))
+    CreateDir cudaSolution.OutputNuGetDir
+    nugetPackManually cudaSolution [ cudaWinPack ]
+
+    // NuGet Sign (all or nothing)
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver cudaSolution
+
+    )
+"Prepare" ==> "CudaWinBuild"
+
+Target "OpenBlasWinBuild" (fun _ ->
+
+    restore openBlasSolution
+    buildConfig32 "Release-OpenBLAS" !! "MathNet.Numerics.OpenBLAS.sln"
+    buildConfig64 "Release-OpenBLAS" !! "MathNet.Numerics.OpenBLAS.sln"
+    CreateDir openBlasSolution.OutputZipDir
+    zip openBlasWinZipPackage openBlasSolution.OutputZipDir "out/OpenBLAS/Windows" (fun f -> f.Contains("MathNet.Numerics.OpenBLAS.") || f.Contains("libgcc") || f.Contains("libgfortran") || f.Contains("libopenblas") || f.Contains("libquadmath"))
+    CreateDir openBlasSolution.OutputNuGetDir
+    nugetPackManually openBlasSolution [ openBlasWinPack ]
+
+    // NuGet Sign (all or nothing)
+    if isWindows && hasBuildParam "sign" then signNuGet fingerprint timeserver openBlasSolution
+
+    )
+"Prepare" ==> "OpenBlasWinBuild"
 
 
 // --------------------------------------------------------------------------------------
@@ -441,22 +346,22 @@ let testMKL framework = test "src/Numerics.Tests" "Numerics.Tests.MKL.csproj" fr
 Target "MklTest" DoNothing
 Target "MklTestCore2.0" (fun _ -> testMKL "netcoreapp2.0")
 Target "MklTestNET40" (fun _ -> testMKL "net40")
-"Build" ==> "MklTestCore2.0" ==> "MklTest"
-"Build" =?> ("MklTestNET40", isWindows) ==> "MklTest"
+"MklWinBuild" ==> "MklTestCore2.0" ==> "MklTest"
+"MklWinBuild" =?> ("MklTestNET40", isWindows) ==> "MklTest"
 
 let testOpenBLAS framework = test "src/Numerics.Tests" "Numerics.Tests.OpenBLAS.csproj" framework
 Target "OpenBlasTest" DoNothing
 Target "OpenBlasTestCore2.0" (fun _ -> testOpenBLAS "netcoreapp2.0")
 Target "OpenBlasTestNET40" (fun _ -> testOpenBLAS "net40")
-"Build" ==> "OpenBlasTestCore2.0" ==> "OpenBlasTest"
-"Build" =?> ("OpenBlasTestNET40", isWindows) ==> "OpenBlasTest"
+"OpenBlasWinBuild" ==> "OpenBlasTestCore2.0" ==> "OpenBlasTest"
+"OpenBlasWinBuild" =?> ("OpenBlasTestNET40", isWindows) ==> "OpenBlasTest"
 
 let testCUDA framework = test "src/Numerics.Tests" "Numerics.Tests.CUDA.csproj" framework
 Target "CudaTest" DoNothing
 Target "CudaTestCore2.0" (fun _ -> testCUDA "netcoreapp2.0")
 Target "CudaTestNET40" (fun _ -> testCUDA "net40")
-"Build" ==> "CudaTestCore2.0" ==> "CudaTest"
-"Build" =?> ("CudaTestNET40", isWindows) ==> "CudaTest"
+"CudaWinBuild" ==> "CudaTestCore2.0" ==> "CudaTest"
+"CudaWinBuild" =?> ("CudaTestNET40", isWindows) ==> "CudaTest"
 
 let testData framework = test "src/Data.Tests" "Data.Tests.csproj" framework
 Target "DataTest" DoNothing
@@ -469,62 +374,20 @@ Target "DataTestNET45" (fun _ -> testData "net45")
 
 
 // --------------------------------------------------------------------------------------
-// PACKAGES
+// LINUX PACKAGES
 // --------------------------------------------------------------------------------------
 
-Target "Pack" DoNothing
-Target "DataPack" DoNothing
-Target "MklWinPack" DoNothing
 Target "MklLinuxPack" DoNothing
-Target "CudaWinPack" DoNothing
-Target "OpenBlasWinPack" DoNothing
-
-
-// ZIP
-
-Target "MklWinZip" (fun _ ->
-    CreateDir "out/MKL/packages/Zip"
-    zip mklWinZipPackage "out/MKL/packages/Zip" "out/MKL/Windows" (fun f -> f.Contains("MathNet.Numerics.MKL.") || f.Contains("libiomp5md.dll")))
-"MklWinBuild" ==> "MklWinZip" ==> "MklWinPack"
 
 Target "MklLinuxZip" (fun _ ->
-    CreateDir "out/MKL/packages/Zip"
-    zip mklLinuxZipPackage "out/MKL/packages/Zip" "out/MKL/Linux" (fun f -> f.Contains("MathNet.Numerics.MKL.") || f.Contains("libiomp5.so")))
-// "MklLinuxBuild" ==> "MklLinuxZip" ==> "MklLinuxPack"
+    CreateDir mklSolution.OutputZipDir
+    zip mklLinuxZipPackage mklSolution.OutputZipDir "out/MKL/Linux" (fun f -> f.Contains("MathNet.Numerics.MKL.") || f.Contains("libiomp5.so")))
 "MklLinuxZip" ==> "MklLinuxPack"
 
-Target "CudaWinZip" (fun _ ->
-    CreateDir "out/CUDA/packages/Zip"
-    zip cudaWinZipPackage "out/CUDA/packages/Zip" "out/CUDA/Windows" (fun f -> f.Contains("MathNet.Numerics.CUDA.") || f.Contains("cublas") || f.Contains("cudart") || f.Contains("cusolver")))
-"CudaWinBuild" ==> "CudaWinZip" ==> "CudaWinPack"
-
-Target "OpenBlasWinZip" (fun _ ->
-    CreateDir "out/OpenBLAS/packages/Zip"
-    zip openBlasWinZipPackage "out/OpenBLAS/packages/Zip" "out/OpenBLAS/Windows" (fun f -> f.Contains("MathNet.Numerics.OpenBLAS.") || f.Contains("libgcc") || f.Contains("libgfortran") || f.Contains("libopenblas") || f.Contains("libquadmath")))
-"OpenBlasWinBuild" ==> "OpenBlasWinZip" ==> "OpenBlasWinPack"
-
-// NUGET
-
-Target "MklWinNuGet" (fun _ ->
-    CreateDir "out/MKL/packages/NuGet"
-    nugetPackExtension mklWinBundle "out/MKL/packages/NuGet")
-"MklWinBuild" ==> "MklWinNuGet" ==> "MklWinPack"
-
 Target "MklLinuxNuGet" (fun _ ->
-    CreateDir "out/MKL/packages/NuGet"
-    nugetPackExtension mklLinuxBundle "out/MKL/packages/NuGet")
-// "MklLinuxBuild" ==> "MklLinuxNuGet" ==> "MklLinuxPack"
+    CreateDir mklSolution.OutputNuGetDir
+    nugetPackManually mklSolution [ mklLinuxPack; mklLinux32Pack; mklLinux64Pack ])
 "MklLinuxNuGet" ==> "MklLinuxPack"
-
-Target "CudaWinNuGet" (fun _ ->
-    CreateDir "out/CUDA/packages/NuGet"
-    nugetPackExtension cudaWinBundle "out/CUDA/packages/NuGet")
-"CudaWinBuild" ==> "CudaWinNuGet" ==> "CudaWinPack"
-
-Target "OpenBlasWinNuGet" (fun _ ->
-    CreateDir "out/OpenBLAS/packages/NuGet"
-    nugetPackExtension openBlasWinBundle "out/OpenBLAS/packages/NuGet")
-"OpenBlasWinBuild" ==> "OpenBlasWinNuGet" ==> "OpenBlasWinPack"
 
 
 // --------------------------------------------------------------------------------------
@@ -598,17 +461,17 @@ Target "PublishMirrors" (fun _ -> publishMirrors ())
 Target "PublishDocs" (fun _ -> publishDocs numericsRelease)
 Target "PublishApi" (fun _ -> publishApi numericsRelease)
 
-Target "PublishArchive" (fun _ -> publishArchive "out/Numerics/packages/Zip" "out/Numerics/packages/NuGet" [numericsZipPackage; numericsStrongNameZipPackage] [numericsNuGetPackage; numericsFSharpNuGetPackage; numericsStrongNameNuGetPackage; numericsFSharpStrongNameNuGetPackage])
-Target "DataPublishArchive" (fun _ -> publishArchive "out/Data/packages/Zip" "out/Data/packages/NuGet" [dataZipPackage; dataStrongNameZipPackage] [dataTextNuGetPackage; dataMatlabNuGetPackage; dataTextStrongNameNuGetPackage; dataMatlabStrongNameNuGetPackage])
-Target "MklPublishArchive" (fun _ -> publishArchive "out/MKL/packages/Zip" "out/MKL/packages/NuGet" [mklWinZipPackage; mklLinuxZipPackage] [mklWinNuGetPackage; mklWin32NuGetPackage; mklWin64NuGetPackage; mklLinuxNuGetPackage; mklLinux32NuGetPackage; mklLinux64NuGetPackage])
-Target "CudaPublishArchive" (fun _ -> publishArchive "out/CUDA/packages/Zip" "out/CUDA/packages/NuGet" [cudaWinZipPackage] [cudaWinNuGetPackage])
-Target "OpenBlasPublishArchive" (fun _ -> publishArchive "out/OpenBLAS/packages/Zip" "out/OpenBLAS/packages/NuGet" [openBlasWinZipPackage] [openBlasWinNuGetPackage])
+Target "PublishArchive" (fun _ -> publishArchive numericsSolution)
+Target "DataPublishArchive" (fun _ -> publishArchive dataSolution)
+Target "MklPublishArchive" (fun _ -> publishArchive mklSolution)
+Target "CudaPublishArchive" (fun _ -> publishArchive cudaSolution)
+Target "OpenBlasPublishArchive" (fun _ -> publishArchive openBlasSolution)
 
-Target "PublishNuGet" (fun _ -> !! "out/Numerics/packages/NuGet/*.nupkg" -- "out/Numerics/packages/NuGet/*.symbols.nupkg" |> publishNuGet)
-Target "DataPublishNuGet" (fun _ -> !! "out/Data/packages/NuGet/*.nupkg" |> publishNuGet)
-Target "MklPublishNuGet" (fun _ -> !! "out/MKL/packages/NuGet/*.nupkg" |> publishNuGet)
-Target "CudaPublishNuGet" (fun _ -> !! "out/CUDA/packages/NuGet/*.nupkg" |> publishNuGet)
-Target "OpenBlasPublishNuGet" (fun _ -> !! "out/OpenBLAS/packages/NuGet/*.nupkg" |> publishNuGet)
+Target "PublishNuGet" (fun _ -> publishNuGet !! (numericsSolution.OutputNuGetDir </> "/*.nupkg"))
+Target "DataPublishNuGet" (fun _ -> publishNuGet !! (dataSolution.OutputNuGetDir </> "/*.nupkg"))
+Target "MklPublishNuGet" (fun _ -> publishNuGet !! (mklSolution.OutputNuGetDir </> "/*.nupkg"))
+Target "CudaPublishNuGet" (fun _ -> publishNuGet !! (cudaSolution.OutputNuGetDir </> "/*.nupkg"))
+Target "OpenBlasPublishNuGet" (fun _ -> publishNuGet !! (openBlasSolution.OutputNuGetDir </> "/*.nupkg"))
 
 Target "Publish" DoNothing
 Dependencies "Publish" [ "PublishTag"; "PublishDocs"; "PublishApi"; "PublishArchive"; "PublishNuGet" ]
@@ -637,12 +500,12 @@ Target "DataAll" DoNothing
 Dependencies "DataAll" [ "DataBuild"; "DataTest" ]
 
 Target "MklWinAll" DoNothing
-Dependencies "MklWinAll" [ "MklWinPack"; "MklTest" ]
+Dependencies "MklWinAll" [ "MklWinBuild"; "MklTest" ]
 
 Target "CudaWinAll" DoNothing
-Dependencies "CudaWinAll" [ "CudaWinPack"; "CudaTest" ]
+Dependencies "CudaWinAll" [ "CudaWinBuild"; "CudaTest" ]
 
 Target "OpenBlasWinAll" DoNothing
-Dependencies "OpenBlasWinAll" [ "OpenBlasWinPack"; "OpenBlasTest" ]
+Dependencies "OpenBlasWinAll" [ "OpenBlasWinBuild"; "OpenBlasTest" ]
 
 RunTargetOrDefault "Test"
